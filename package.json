@@ -1,0 +1,29 @@
+{
+  "name": "grpc-ts-events-client-server",
+  "version": "1.0.0",
+  "description": "gRPC events",
+  "keywords": [
+    "gRPC",
+    "Events"
+  ],
+  "homepage": "https://github.com/EmiRoberti77/grpc-ts-events-client-server#readme",
+  "bugs": {
+    "url": "https://github.com/EmiRoberti77/grpc-ts-events-client-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/EmiRoberti77/grpc-ts-events-client-server.git"
+  },
+  "license": "ISC",
+  "author": "Emi Roberti",
+  "type": "commonjs",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
