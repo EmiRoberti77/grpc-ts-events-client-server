@@ -181,7 +181,7 @@ npm install
 If you make changes to `event.proto`, regenerate TypeScript definitions:
 
 ```sh
-npx proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --outDir=src/proto event.proto
+npx proto-loader-gen-types --grpcLib=@grpc/grpc-js --outDir=./src/proto/ ./src/proto/*.proto
 ```
 
 ### Running the Server
