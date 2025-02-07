@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package EventControllerPackage;
+
+service Controller {
+    rpc StreamEvent(EventRequest) returns (stream EventMessage){}
+}
+
+message EventRequest {
+    string client_id = 1;
+}
+
+message EventMessage{
+    string id = 1;
+    string message = 2;
+    string timeStamp = 3;
+}
