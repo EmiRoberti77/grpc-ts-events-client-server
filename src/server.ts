@@ -14,6 +14,14 @@ const CLIENT_DISCONNECTED = "client disconnected";
 const GRPC_SERVER_RUNNING = "gRPC server running on PORT";
 const HOST = `0.0.0.0:${PORT}`;
 
+const serverCert = fs.readFileSync(
+  path.join(__dirname, "..", "certs", "server.crt")
+);
+const serverKey = fs.readFileSync(
+  path.join(__dirname, "..", "certs", "server.key")
+);
+const rootCert = fs.readFileSync(path.join(__dirname, "..", "certs", "ca.crt"));
+
 const _PROTO_PATH = path.join(__dirname, PROTO, EVENT_PROTO);
 const found = fs.existsSync(_PROTO_PATH);
 console.log(found);
@@ -31,9 +39,6 @@ const activeClients: Map<
 > = new Map();
 
 function sendEventToClient() {
-  console.log("sendToClient");
-  console.log("active client size", activeClients.size);
-
   for (let client of activeClients.values()) {
     const id = client.request.clientId;
     const response: EventMessage = {
@@ -41,18 +46,13 @@ function sendEventToClient() {
       message: JSON.stringify({ message: id }),
       timeStamp: new Date().toISOString(),
     };
-    console.log("sending ..");
-    console.log(response);
     client.write(response);
-    console.log("sent ..");
   }
 }
 async function main() {
   server.addService(eventController.Controller.service, {
     StreamEvent: (req: grpc.ServerWritableStream<any, any>) => {
       const client_id = (req.request as EventRequest).clientId;
-      console.log("request=", req.request);
-      console.log("client_id=", client_id);
       console.log(CONNECTED, client_id);
       if (!client_id) {
         console.log("client id is undefined");
@@ -69,19 +69,25 @@ async function main() {
     },
   });
 
-  server.bindAsync(HOST, grpc.ServerCredentials.createInsecure(), () => {
-    console.log(GRPC_SERVER_RUNNING, PORT);
-  });
+  server.bindAsync(
+    HOST,
+    grpc.ServerCredentials.createSsl(
+      rootCert,
+      [{ cert_chain: serverCert, private_key: serverKey }],
+      false
+    ),
+    () => {
+      console.log("🔐", GRPC_SERVER_RUNNING, PORT);
+    }
+  );
 }
 
 function emulateEvent() {
-  console.log("emulate event");
   let count = 0;
   const interval = setInterval(() => {
-    sendEventToClient();
     console.log("count", count);
     count += 1;
-    count === 50 ? clearInterval(interval) : () => console.log(".");
+    count === 50 ? clearInterval(interval) : sendEventToClient();
   }, 2000);
 }
 

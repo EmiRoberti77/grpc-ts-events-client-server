@@ -2,10 +2,12 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import path from "path";
+import fs from "fs";
 import { ProtoGrpcType } from "./proto/event";
 import { EventRequest } from "./proto/EventControllerPackage/EventRequest";
 
 const _PROTO_PATH = path.join(__dirname, "proto", "event.proto");
+const rootCert = fs.readFileSync(path.join(__dirname, "..", "certs", "ca.crt"));
 
 // Load gRPC service definition
 const packageDefinition = protoLoader.loadSync(_PROTO_PATH);
@@ -14,7 +16,7 @@ const grpcObj = grpc.loadPackageDefinition(
 ) as unknown as ProtoGrpcType;
 const client = new grpcObj.EventControllerPackage.Controller(
   "localhost:50051",
-  grpc.credentials.createInsecure()
+  grpc.credentials.createSsl(rootCert)
 );
 const eventRequest: EventRequest = {
   clientId: "emi_client",
