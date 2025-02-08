@@ -16,13 +16,15 @@ const client = new grpcObj.EventControllerPackage.Controller(
   "localhost:50051",
   grpc.credentials.createInsecure()
 );
-
+const eventRequest: EventRequest = {
+  clientId: "emi_client",
+};
 // Call the StreamEvents RPC
-const stream = client.StreamEvent({ client_id: "client_emi" } as EventRequest);
+const stream = client.StreamEvent(eventRequest);
 
 stream.on("data", (response: any) => {
   console.log(
-    `Received event: ${response.event_id} - ${response.message} at ${response.timestamp}`
+    `Received event: ${response.id} - ${response.message} at ${response.timeStamp}`
   );
 });
 
